@@ -23,8 +23,9 @@ def upload_data():
 
 @app.route('/download/<date>', methods=['GET'])
 def download_data(date):
+    directory = '.'
     filename = f"data_{date}.csv"
-    return send_from_directory(directory='.', filename=filename, as_attachment=True)
+    return send_from_directory(directory, filename=filename, as_attachment=True)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)
