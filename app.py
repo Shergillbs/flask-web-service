@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory, abort
 import pandas as pd
 import os
 
@@ -26,7 +26,14 @@ def upload_data():
 def download_data(date):
     directory = os.path.abspath('.')  # Using an absolute path for clarity
     filename = f"data_{date}.csv"
+    full_path = os.path.join(directory, filename)
+    
+    # Check if the file exists
+    if not os.path.exists(full_path):
+        abort(404, description="Resource not found")
+    
     return send_from_directory(directory=directory, filename=filename, as_attachment=True)
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", debug=True)
+
