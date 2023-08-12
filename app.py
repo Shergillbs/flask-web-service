@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 import pandas as pd
 
 app = Flask(__name__)
@@ -21,5 +21,11 @@ def upload_data():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/download/<date>', methods=['GET'])
+def download_data(date):
+    filename = f"data_{date}.csv"
+    return send_from_directory(directory='.', filename=filename, as_attachment=True)
+
 if __name__ == "__main__":
-    app.run(host="0.0.0.0",debug=True)
+    app.run(host="0.0.0.0", debug=True)
+
