@@ -1,24 +1,25 @@
 from flask import Flask, request, jsonify
-import csv
+import pandas as pd
 
 app = Flask(__name__)
 
-@app.route('/data-endpoint', methods=['POST'])
-def receive_data():
-    # Get JSON data from request
-    data = request.json
+@app.route('/upload_data', methods=['POST'])
+def upload_data():
+    try:
+        # Get JSON data from the POST request
+        data = request.get_json()
 
-    # Save data to CSV file
-    with open('data.csv', 'a', newline='') as csvfile:
-        fieldnames = ['EndTime', 'Open', 'High', 'Low', 'Close', 'Volume', 'RSI']
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        
-        # Uncomment the next line if you want to write headers to the file
-        # writer.writeheader()  
-        
-        writer.writerow(data)
+        # Convert the data to a DataFrame
+        df = pd.DataFrame(data)
 
-    return jsonify({'message': 'Data saved successfully!'}), 200
+        # Save the DataFrame as a CSV file with the current date
+        filename = f"data_{df['DateTime'][0][:10]}.csv"
+        df.to_csv(filename, index=False)
+
+        return jsonify({"message": "Data successfully saved."}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0",debug=True)
